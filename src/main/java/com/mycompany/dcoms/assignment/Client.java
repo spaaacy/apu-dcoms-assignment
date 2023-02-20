@@ -19,11 +19,12 @@ public class Client {
     
     public static void main(String[] args) throws NotBoundException, MalformedURLException, RemoteException {
         AuthInterface auth = (AuthInterface)Naming.lookup("rmi://localhost:1050/" + authServerName);
-//        auth.register("aakif", "ahamath", "spacy1", "abc123");
-        try {
-            boolean success = auth.login("spacy", "abc123");
-            System.out.println("Login was successful? " + success);
-        } catch (MultipleUserException ex) {}
+        
+        boolean success = auth.register("spacy2", "abc123", "aakif", "ahamath");
+        System.out.println("Register was successful? " + success);
+        
+//        boolean success = auth.login("spacy1", "abc123");
+//        System.out.println("Login was successful? " + success);
     }
     
 }

@@ -8,11 +8,11 @@ package com.mycompany.dcoms.assignment;
  *
  * @author aakif
  */
-public class MultipleUserException extends Exception {
+public class UsernameExistsException extends Exception {
     
-    static String errorMessage = "Multiple users with the same username exists!";
+    static String errorMessage = "Username already exists!";
     
-    MultipleUserException() {
+    UsernameExistsException() {
         super(errorMessage);
     }
     

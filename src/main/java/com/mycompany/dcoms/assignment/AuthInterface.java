@@ -13,7 +13,7 @@ import java.rmi.RemoteException;
  */
 public interface AuthInterface extends Remote {
 
-    public boolean register(String firstName, String lastName, String username, String password) throws RemoteException;
-    public boolean login(String username, String password) throws RemoteException, MultipleUserException;
+    public boolean register(String username, String password, String firstName, String lastName) throws RemoteException;
+    public boolean login(String username, String password) throws RemoteException;
 
 }

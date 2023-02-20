@@ -28,41 +28,59 @@ public class Auth extends UnicastRemoteObject implements AuthInterface {
         super();
     }
     
+    /*
+    Returns true if registration successful, and false if username already exists
+    */
     @Override
-    public boolean register(String firstName, String lastName, String username, String password) {
-        // TODO: If username exists return false
-        try(Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);) {
-            Statement statement = conn.createStatement();
-            String query = "INSERT INTO USERS VALUES ('" + username + "', '" + password + "', '" + firstName + "', '" + lastName + "')";
-            statement.executeUpdate(query);
-            return true;
-        }
-        catch (SQLException ex) {}
-        return false;
-    }
-    
-    @Override
-    public boolean login(String username, String password) throws MultipleUserException {
+    public boolean register(String username, String password, String firstName, String lastName) {
         
         boolean success = false;
         
         try(Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);) {
+
+            // Check to see if username already exists
             Statement statement = conn.createStatement();
-//            String query = "SELECT * FROM USERS WHERE username = '" + username + "'";
-            String query = "SELECT * FROM USERS WHERE first_name = 'aakif'";
-            ResultSet rs = statement.executeQuery(query);
+            String query = "SELECT username FROM USERS WHERE username = '" + username +"'"; 
+            ResultSet usernameResults = statement.executeQuery(query);
+//            if (usernameResults.getFetchSize() > 0) {
+//                throw new UsernameExistsException();
+//            }
             
-            if (rs.getFetchSize() > 1) {
-                throw new MultipleUserException();
-            }
             
-            while(rs.next()) {
-                String fetchedPassword = rs.getString(2);
-                success = fetchedPassword.equals(password);
-            }
+            statement = conn.createStatement();
+//            query = "INSERT INTO USERS VALUES ('" + username + "', '" + password + "', '" + firstName + "', '" + lastName + "')";
+            query = "INSERT INTO USERS VALUES ('asdqwew', '" + password + "', '" + firstName + "', '" + lastName + "')";
+            statement.executeUpdate(query);
+            success = true;
+            
         }
-        catch (SQLException ex) {}
+//        catch (UsernameExistsException ex) {
+//            success = false;
+//        }
+        catch (SQLException ex) {
+            if (ex.get)
+            success = false;
+        }
         
+        return success;
+        
+    }
+    
+    @Override
+    public boolean login(String username, String password) {
+        
+        boolean success = false;
+        
+        try (Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);) {
+            Statement statement = conn.createStatement();
+            String query = "SELECT password FROM USERS WHERE username = '" + username + "'";
+            ResultSet passwordResults = statement.executeQuery(query);
+            passwordResults.next();
+            String fetchedPassword = passwordResults.getString(1);
+            System.out.println("Password: " + fetchedPassword);
+            success = fetchedPassword.equals(password);
+        } catch (SQLException e) {}
+            
         return success;        
     
     }
