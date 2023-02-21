@@ -28,38 +28,27 @@ public class Auth extends UnicastRemoteObject implements AuthInterface {
         super();
     }
     
-    /*
-    Returns true if registration successful, and false if username already exists
-    */
+    /**
+     * Returns true if registration successful, and false if username already exists
+     */
     @Override
-    public boolean register(String username, String password, String firstName, String lastName) {
+    public boolean register(String username, String password, String firstName, String lastName) throws UsernameExistsException {
         
         boolean success = false;
         
         try(Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);) {
-
-            // Check to see if username already exists
             Statement statement = conn.createStatement();
-            String query = "SELECT username FROM USERS WHERE username = '" + username +"'"; 
-            ResultSet usernameResults = statement.executeQuery(query);
-//            if (usernameResults.getFetchSize() > 0) {
-//                throw new UsernameExistsException();
-//            }
-            
-            
-            statement = conn.createStatement();
-//            query = "INSERT INTO USERS VALUES ('" + username + "', '" + password + "', '" + firstName + "', '" + lastName + "')";
-            query = "INSERT INTO USERS VALUES ('asdqwew', '" + password + "', '" + firstName + "', '" + lastName + "')";
+            String query = "INSERT INTO USERS VALUES ('" + username + "', '" + password + "', '" + firstName + "', '" + lastName + "')";
             statement.executeUpdate(query);
             success = true;
             
         }
-//        catch (UsernameExistsException ex) {
-//            success = false;
-//        }
         catch (SQLException ex) {
-            if (ex.get)
-            success = false;
+            // SQLState 23505 represents instance where primary key pre-exists in table
+            String invalidPrimaryKeyErrorCode = "23505";
+            if(ex.getSQLState().equals(invalidPrimaryKeyErrorCode) ) {
+                throw new UsernameExistsException(ex);
+            }
         }
         
         return success;

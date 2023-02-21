@@ -12,8 +12,8 @@ public class UsernameExistsException extends Exception {
     
     static String errorMessage = "Username already exists!";
     
-    UsernameExistsException() {
-        super(errorMessage);
+    UsernameExistsException(Exception ex) {
+        super(errorMessage, ex);
     }
     
 }
