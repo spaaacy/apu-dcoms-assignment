@@ -18,14 +18,14 @@ import java.util.logging.Logger;
  *
  * @author aakif
  */
-public class AuthRemote extends UnicastRemoteObject implements AuthInterface {
+public class AuthObject extends UnicastRemoteObject implements AuthInterface {
 
     String dbUrl = "jdbc:derby://localhost:1527/KGF";
     String dbUsername = "kgf";
     String dbPassword = "kgf";
-    String userTableName = "user";
+    String tableName = "user";
     
-    AuthRemote() throws RemoteException {
+    AuthObject() throws RemoteException {
         super();
     }
     
@@ -33,13 +33,13 @@ public class AuthRemote extends UnicastRemoteObject implements AuthInterface {
      * Returns true if registration successful, and false if username already exists
      */
     @Override
-    public boolean register(String username, String password, String firstName, String lastName, String ic_number) throws UsernameExistsException {
+    public boolean register(String username, String password, String firstName, String lastName, String ic_number) throws RemoteException, UsernameExistsException {
         
         boolean success = false;
         
         try(Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);) {
             Statement statement = conn.createStatement();
-            String query = "INSERT INTO " + userTableName + " VALUES ('" + username + "', '" + password + "', '" + firstName + "', '" + lastName + "', '" + ic_number + "')";
+            String query = "INSERT INTO " + tableName + " VALUES ('" + username + "', '" + password + "', '" + firstName + "', '" + lastName + "', '" + ic_number + "')";
             statement.executeUpdate(query);
             success = true;
             
@@ -58,14 +58,14 @@ public class AuthRemote extends UnicastRemoteObject implements AuthInterface {
     
     
     @Override
-    public boolean login(String username, String password) {
+    public boolean login(String username, String password) throws RemoteException {
         
         boolean success = false;
         
         try (Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);) {
             
             Statement statement = conn.createStatement();
-            String query = "SELECT * FROM " + userTableName + " WHERE username = '" + username + "' AND password = '" + password + "'";
+            String query = "SELECT * FROM " + tableName + " WHERE username = '" + username + "' AND password = '" + password + "'";
             ResultSet passwordResults = statement.executeQuery(query);
             
             if(passwordResults.next()) {

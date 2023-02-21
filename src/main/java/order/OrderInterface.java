@@ -14,7 +14,7 @@ import java.util.LinkedList;
  */
 public interface OrderInterface extends Remote {
     
-    public boolean createOrder() throws RemoteException;
-    public LinkedList<Product> getOrders(String username) throws RemoteException;
+    public boolean createOrder(int product_id, String username, int quantity) throws RemoteException;
+    public void getOrders(String username) throws RemoteException;
     
 }

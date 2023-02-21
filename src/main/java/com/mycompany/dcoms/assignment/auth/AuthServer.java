@@ -19,7 +19,7 @@ public class AuthServer {
     static String serverName = "AuthServer";
     
     public static void main(String[] args) throws RemoteException {
-        AuthInterface authService = new AuthRemote();
+        AuthInterface authService = new AuthObject();
         Registry reg = LocateRegistry.createRegistry(1050);
         reg.rebind(serverName, authService);
     }
