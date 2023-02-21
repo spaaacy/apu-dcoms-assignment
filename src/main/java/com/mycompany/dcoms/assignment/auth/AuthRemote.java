@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  */
 
-package com.mycompany.dcoms.assignment;
+package com.mycompany.dcoms.assignment.auth;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -18,13 +18,13 @@ import java.util.logging.Logger;
  *
  * @author aakif
  */
-public class Auth extends UnicastRemoteObject implements AuthInterface {
+public class AuthRemote extends UnicastRemoteObject implements AuthInterface {
 
     String dbUrl = "jdbc:derby://localhost:1527/KGF";
     String dbUsername = "kgf";
     String dbPassword = "kgf";
     
-    Auth() throws RemoteException {
+    AuthRemote() throws RemoteException {
         super();
     }
     
@@ -32,13 +32,13 @@ public class Auth extends UnicastRemoteObject implements AuthInterface {
      * Returns true if registration successful, and false if username already exists
      */
     @Override
-    public boolean register(String username, String password, String firstName, String lastName) throws UsernameExistsException {
+    public boolean register(String username, String password, String firstName, String lastName, String ic_number) throws UsernameExistsException {
         
         boolean success = false;
         
         try(Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);) {
             Statement statement = conn.createStatement();
-            String query = "INSERT INTO USERS VALUES ('" + username + "', '" + password + "', '" + firstName + "', '" + lastName + "')";
+            String query = "INSERT INTO USERS VALUES ('" + username + "', '" + password + "', '" + firstName + "', '" + lastName + "', '" + ic_number + "')";
             statement.executeUpdate(query);
             success = true;
             
@@ -55,20 +55,23 @@ public class Auth extends UnicastRemoteObject implements AuthInterface {
         
     }
     
+    
     @Override
     public boolean login(String username, String password) {
         
         boolean success = false;
         
         try (Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);) {
+            
             Statement statement = conn.createStatement();
-            String query = "SELECT password FROM USERS WHERE username = '" + username + "'";
+            String query = "SELECT * FROM USERS WHERE username = '" + username + "' AND password = '" + password + "'";
             ResultSet passwordResults = statement.executeQuery(query);
-            passwordResults.next();
-            String fetchedPassword = passwordResults.getString(1);
-            System.out.println("Password: " + fetchedPassword);
-            success = fetchedPassword.equals(password);
-        } catch (SQLException e) {}
+            
+            if(passwordResults.next()) {
+                success = true;
+            }
+            
+        } catch (SQLException ex) {}
             
         return success;        
     

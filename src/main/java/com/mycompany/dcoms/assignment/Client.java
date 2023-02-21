@@ -4,6 +4,7 @@
  */
 package com.mycompany.dcoms.assignment;
 
+import com.mycompany.dcoms.assignment.auth.AuthInterface;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -19,16 +20,19 @@ public class Client {
     
     public static void main(String[] args) throws NotBoundException, MalformedURLException, RemoteException {
         AuthInterface auth = (AuthInterface)Naming.lookup("rmi://localhost:1050/" + authServerName);
+           
+        // Register
+//        try {
+//            boolean success = auth.register("spacy5", "abc123", "aakif", "ahamath");
+//            System.out.println("Register was successful.");
+//        } catch (UsernameExistsException ex) {
+//            System.out.println("Register was not successful.");
+//        }
         
-        try {
-            boolean success = auth.register("spacy5", "abc123", "aakif", "ahamath");
-            System.out.println("Register was successful.");
-        } catch (UsernameExistsException ex) {
-            System.out.println("Register was not successful.");
-        }
+        // Login
+        boolean success = auth.login("spacy1", "abc123");
+        System.out.println("Login was successful? " + success);
         
-//        boolean success = auth.login("spacy1", "abc123");
-//        System.out.println("Login was successful? " + success);
     }
     
 }
