@@ -23,6 +23,7 @@ public class AuthRemote extends UnicastRemoteObject implements AuthInterface {
     String dbUrl = "jdbc:derby://localhost:1527/KGF";
     String dbUsername = "kgf";
     String dbPassword = "kgf";
+    String userTableName = "user";
     
     AuthRemote() throws RemoteException {
         super();
@@ -38,7 +39,7 @@ public class AuthRemote extends UnicastRemoteObject implements AuthInterface {
         
         try(Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);) {
             Statement statement = conn.createStatement();
-            String query = "INSERT INTO USERS VALUES ('" + username + "', '" + password + "', '" + firstName + "', '" + lastName + "', '" + ic_number + "')";
+            String query = "INSERT INTO " + userTableName + " VALUES ('" + username + "', '" + password + "', '" + firstName + "', '" + lastName + "', '" + ic_number + "')";
             statement.executeUpdate(query);
             success = true;
             
@@ -64,7 +65,7 @@ public class AuthRemote extends UnicastRemoteObject implements AuthInterface {
         try (Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);) {
             
             Statement statement = conn.createStatement();
-            String query = "SELECT * FROM USERS WHERE username = '" + username + "' AND password = '" + password + "'";
+            String query = "SELECT * FROM " + userTableName + " WHERE username = '" + username + "' AND password = '" + password + "'";
             ResultSet passwordResults = statement.executeQuery(query);
             
             if(passwordResults.next()) {
