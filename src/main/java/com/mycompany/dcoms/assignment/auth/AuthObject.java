@@ -8,11 +8,13 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import model.User;
 
 /**
  *
@@ -23,7 +25,7 @@ public class AuthObject extends UnicastRemoteObject implements AuthInterface {
     String dbUrl = "jdbc:derby://localhost:1527/KGF";
     String dbUsername = "kgf";
     String dbPassword = "kgf";
-    String tableName = "user";
+    String tableName = "tblUser";
     
     AuthObject() throws RemoteException {
         super();
@@ -33,14 +35,20 @@ public class AuthObject extends UnicastRemoteObject implements AuthInterface {
      * Returns true if registration successful, and false if username already exists
      */
     @Override
-    public boolean register(String username, String password, String firstName, String lastName, String ic_number) throws RemoteException, UsernameExistsException {
+    public boolean register(User user) throws RemoteException, UsernameExistsException {
         
         boolean success = false;
         
         try(Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);) {
-            Statement statement = conn.createStatement();
-            String query = "INSERT INTO " + tableName + " VALUES ('" + username + "', '" + password + "', '" + firstName + "', '" + lastName + "', '" + ic_number + "')";
-            statement.executeUpdate(query);
+            PreparedStatement statement = conn.prepareStatement("INSERT INTO ? VALUES (?, ?, ?, ?, ?)");
+            statement.setString(1, tableName);
+            statement.setString(2, user.getUsername());
+            statement.setString(3, user.getPassword());
+            statement.setString(4, user.getFirstName());
+            statement.setString(5, user.getLastName());
+            statement.setString(6, user.getIcNumber());
+//            String query = "INSERT INTO " + tableName + " VALUES ('" + user.getUsername() + "', '" + user.getPassword() + "', '" + user.getFirstName() + "', '" + user.getLastName() + "', '" + user.getIcNumber() + "')";
+            statement.executeUpdate();
             success = true;
             
         }

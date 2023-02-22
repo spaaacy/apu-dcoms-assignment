@@ -7,6 +7,7 @@ package order;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.LinkedList;
+import model.Order;
 
 /**
  *
@@ -14,7 +15,7 @@ import java.util.LinkedList;
  */
 public interface OrderInterface extends Remote {
     
-    public boolean createOrder(int product_id, String username, int quantity) throws RemoteException;
-    public void getOrders(String username) throws RemoteException;
+    public boolean createOrder(Order order) throws RemoteException;
+    public LinkedList<Order> getOrders(String username) throws RemoteException;
     
 }

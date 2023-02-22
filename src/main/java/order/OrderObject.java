@@ -11,6 +11,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedList;
+import model.Order;
 
 /**
  *
@@ -23,8 +24,12 @@ public class OrderObject extends UnicastRemoteObject implements OrderInterface {
     String dbPassword = "kgf";
     String tableName = "order";
     
+    OrderObject() throws RemoteException {
+        super();
+    }
+    
     @Override
-    public boolean createOrder(int product_id, String username, int quantity) throws RemoteException {
+    public boolean createOrder(Order order) throws RemoteException {
         
         boolean success = false;
         
@@ -42,7 +47,8 @@ public class OrderObject extends UnicastRemoteObject implements OrderInterface {
     }
 
     @Override
-    public void getOrders(String username) throws RemoteException {
+    public LinkedList<Order> getOrders(String username) throws RemoteException {
+        return new LinkedList<Order>();
     }
     
     

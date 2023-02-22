@@ -6,6 +6,7 @@ package com.mycompany.dcoms.assignment.auth;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import model.User;
 
 /**
  *
@@ -13,7 +14,7 @@ import java.rmi.RemoteException;
  */
 public interface AuthInterface extends Remote {
 
-    public boolean register(String username, String password, String firstName, String lastName, String ic_number) throws RemoteException, UsernameExistsException;
+    public boolean register(User user) throws RemoteException, UsernameExistsException;
     public boolean login(String username, String password) throws RemoteException;
 
 }

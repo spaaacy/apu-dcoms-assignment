@@ -16,7 +16,7 @@ import java.rmi.registry.Registry;
  */
 public class AuthServer {
     
-    static String serverName = "AuthServer";
+    static String serverName = "Auth";
     
     public static void main(String[] args) throws RemoteException {
         AuthInterface authService = new AuthObject();
