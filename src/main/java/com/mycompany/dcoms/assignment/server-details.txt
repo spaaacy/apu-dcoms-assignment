@@ -1,0 +1,4 @@
+Database server name = KGF
+Database username = kgf
+Database password = kgf
+Port used = 1050
