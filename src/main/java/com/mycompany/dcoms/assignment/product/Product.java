@@ -9,23 +9,23 @@ package com.mycompany.dcoms.assignment.product;
  * @author aakif
  */
 public class Product implements java.io.Serializable {
-    String productId;
+    Integer productId;
     String productName;
-    Integer price;
+    Double price;
     Integer totalSupply;
 
-    public Product(String productId, String productName, Integer price, Integer totalSupply) {
+    public Product(Integer productId, String productName, Double price, Integer totalSupply) {
         this.productId = productId;
         this.productName = productName;
         this.price = price;
         this.totalSupply = totalSupply;
     }
 
-    public String getProductId() {
+    public Integer getProductId() {
         return productId;
     }
 
-    public void setProductId(String productId) {
+    public void setProductId(Integer productId) {
         this.productId = productId;
     }
 
@@ -37,11 +37,11 @@ public class Product implements java.io.Serializable {
         this.productName = productName;
     }
 
-    public Integer getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(Integer price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
@@ -52,5 +52,7 @@ public class Product implements java.io.Serializable {
     public void setTotalSupply(Integer totalSupply) {
         this.totalSupply = totalSupply;
     }
+    
+    
     
 }
