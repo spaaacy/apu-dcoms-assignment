@@ -10,6 +10,7 @@ package com.mycompany.dcoms.assignment.auth;
  */
 public class UsernameExistsException extends Exception {
     
+    static final String SQL_PRIMARY_KEY_ERROR_CODE = "23505";
     static String errorMessage = "Username already exists!";
     
     UsernameExistsException(Exception ex) {

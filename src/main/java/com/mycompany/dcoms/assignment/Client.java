@@ -28,7 +28,7 @@ public class Client {
         OrderInterface order = (OrderInterface)Naming.lookup("rmi://localhost:1050/" + ORDER_SERVER_NAME);
            
         /**
-         * Register
+         * Sample Register
          */
 //        boolean success = false;
 //        try {
@@ -41,20 +41,20 @@ public class Client {
 //        }
         
         /**
-         * Login
+         * Sample Login
          */
 //        boolean success = auth.login("spaaaacy", "abc123");
 //        System.out.println("Login successful: " + success);
       
         /**
-         * Create order
+         * Sample Create Order
          */
 //        Order newOrder = new Order(22, "spaaaacy", 4);
 //        boolean success = order.createOrder(newOrder);
 //        System.out.println("Order successful: " + success);
 
         /**
-         * Get orders
+         * Sample Get Orders
          */
 //        LinkedList<Order> allOrders = order.getOrders("spaaaacy");
 //        for (Order nextOrder: allOrders) {

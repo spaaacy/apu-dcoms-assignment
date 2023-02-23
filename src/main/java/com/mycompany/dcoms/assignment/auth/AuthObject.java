@@ -4,6 +4,7 @@
 
 package com.mycompany.dcoms.assignment.auth;
 
+import static com.mycompany.dcoms.assignment.auth.UsernameExistsException.SQL_PRIMARY_KEY_ERROR_CODE;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.Connection;
@@ -26,6 +27,8 @@ public class AuthObject extends UnicastRemoteObject implements AuthInterface {
     static final String DB_PASSWORD = "kgf";
     
     static final String USER_TABLE_NAME = "TBLUSER";
+    static final String USERNAME_COLUMN_NAME = "username";
+    static final String PASSWORD_COLUMN_NAME = "password";
     
     public AuthObject() throws RemoteException {
         super();
@@ -53,8 +56,8 @@ public class AuthObject extends UnicastRemoteObject implements AuthInterface {
         }
         catch (SQLException ex) {
             // SQLState 23505 represents instance where primary key pre-exists in table
-            String invalidPrimaryKeyErrorCode = "23505";
-            if(ex.getSQLState().equals(invalidPrimaryKeyErrorCode) ) {
+            
+            if(ex.getSQLState().equals(SQL_PRIMARY_KEY_ERROR_CODE) ) {
                 throw new UsernameExistsException(ex);
             }
         }
@@ -74,7 +77,8 @@ public class AuthObject extends UnicastRemoteObject implements AuthInterface {
         
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);) {
             
-            PreparedStatement statement = conn.prepareStatement("SELECT * FROM " + USER_TABLE_NAME + " WHERE username = ? AND password = ?");
+            PreparedStatement statement = conn.prepareStatement("SELECT * FROM " + USER_TABLE_NAME + " WHERE " 
+                    + USERNAME_COLUMN_NAME + " = ? AND " + PASSWORD_COLUMN_NAME + " = ?");
             statement.setString(1, username);
             statement.setString(2, password);
             ResultSet results = statement.executeQuery();

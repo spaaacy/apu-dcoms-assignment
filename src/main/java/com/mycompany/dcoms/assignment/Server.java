@@ -22,11 +22,13 @@ public class Server {
     static final String ORDER_SERVER_NAME = "order";
     
     public static void main(String[] args) throws RemoteException {
+        
         AuthInterface auth = new AuthObject();
         OrderInterface order = new OrderObject();
         
         Registry reg = LocateRegistry.createRegistry(1050);
         reg.rebind(AUTH_SERVER_NAME, auth);
         reg.rebind(ORDER_SERVER_NAME, order);
+        
     }
 }
