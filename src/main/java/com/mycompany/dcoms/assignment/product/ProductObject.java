@@ -35,10 +35,30 @@ public class ProductObject extends UnicastRemoteObject implements ProductInterfa
         
         LinkedList<Product> fetchedProducts = new LinkedList<Product>();
         
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            
+            PreparedStatement statement = conn.prepareStatement("SELECT * FROM " + PRODUCT_TABLE_NAME);
+            ResultSet results = statement.executeQuery();
+            
+            while(results.next()) {
+                Integer fetchedProductId = results.getInt(1);
+                String fetchedProductName = results.getString(2);
+                Double fetchedPrice = results.getDouble(3);
+                Integer fetchedTotalSupply = results.getInt(4);
+                
+                Product fetchedProduct = new Product(fetchedProductId, fetchedProductName, fetchedPrice, fetchedTotalSupply);
+                fetchedProducts.add(fetchedProduct);
+            }
+            
+        } catch (SQLException ex) {}
+        
         return fetchedProducts;
         
     }
 
+    /**
+     * Fetches product details using product ID, will return a NULL pointer if not matches found
+     */
     @Override
     public Product getProduct(Integer productId) throws RemoteException {
 
@@ -59,7 +79,9 @@ public class ProductObject extends UnicastRemoteObject implements ProductInterfa
                 fetchedProduct = new Product(fetchedProductId, fetchedProductName, fetchedPrice, fetchedTotalSupply);
             }
             
-        } catch (SQLException ex) {}
+        } catch (SQLException ex) {
+            System.out.println(ex.getSQLState());
+        }
         
         return fetchedProduct;
         

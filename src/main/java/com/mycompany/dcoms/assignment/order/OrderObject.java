@@ -74,6 +74,7 @@ public class OrderObject extends UnicastRemoteObject implements OrderInterface {
                 Integer fetchedQuantity = results.getInt(2);
                 String fetchedUsername = results.getString(3);
                 Integer fetchedProductId = results.getInt(4);
+                
                 Order fetchedOrder = new Order(fetchedOrderId, fetchedQuantity, fetchedUsername, fetchedProductId);
                 allOrders.add(fetchedOrder);
             }
