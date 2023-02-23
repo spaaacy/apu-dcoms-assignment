@@ -6,7 +6,6 @@ package com.mycompany.dcoms.assignment.auth;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import model.User;
 
 /**
  *

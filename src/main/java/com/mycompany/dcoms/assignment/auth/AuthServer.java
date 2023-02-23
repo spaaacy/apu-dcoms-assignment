@@ -16,11 +16,11 @@ import java.rmi.registry.Registry;
  */
 public class AuthServer {
     
-    static String serverName = "Auth";
+    static final String AUTH_SERVER_NAME = "auth";
     
     public static void main(String[] args) throws RemoteException {
         AuthInterface authService = new AuthObject();
         Registry reg = LocateRegistry.createRegistry(1050);
-        reg.rebind(serverName, authService);
+        reg.rebind(AUTH_SERVER_NAME, authService);
     }
 }

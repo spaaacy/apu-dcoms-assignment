@@ -2,32 +2,40 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package model;
+package com.mycompany.dcoms.assignment.order;
 
 /**
  *
  * @author aakif
  */
-public class Order {
+public class Order implements java.io.Serializable {
     
-    Integer orderNumber;
+    Integer orderId;
+    Integer quantity;
     String username;
     Integer productId;
-    Integer quantity;
 
-    public Order(Integer orderNumber, String username, Integer productId, Integer quantity) {
-        this.orderNumber = orderNumber;
+    public Order(Integer orderId, Integer quantity, String username, Integer productId) {
+        this.orderId = orderId;
+        this.quantity = quantity;
         this.username = username;
         this.productId = productId;
+    }
+
+    public Integer getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
-    }
-
-    public Integer getOrderNumber() {
-        return orderNumber;
-    }
-
-    public void setOrderNumber(Integer orderNumber) {
-        this.orderNumber = orderNumber;
     }
 
     public String getUsername() {
@@ -45,15 +53,5 @@ public class Order {
     public void setProductId(Integer productId) {
         this.productId = productId;
     }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-    
-    
     
 }

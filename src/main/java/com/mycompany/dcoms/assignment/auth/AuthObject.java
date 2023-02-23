@@ -14,7 +14,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import model.User;
 
 /**
  *
@@ -22,10 +21,10 @@ import model.User;
  */
 public class AuthObject extends UnicastRemoteObject implements AuthInterface {
 
-    String dbUrl = "jdbc:derby://localhost:1527/KGF";
-    String dbUsername = "kgf";
-    String dbPassword = "kgf";
-    String tableName = "tblUser";
+    static final String DB_URL = "jdbc:derby://localhost:1527/KGF";
+    static final String DB_USERNAME = "kgf";
+    static final String DB_PASSWORD = "kgf";
+    static final String USER_TABLE_NAME = "TBLUSER";
     
     AuthObject() throws RemoteException {
         super();
@@ -39,15 +38,14 @@ public class AuthObject extends UnicastRemoteObject implements AuthInterface {
         
         boolean success = false;
         
-        try(Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);) {
-            PreparedStatement statement = conn.prepareStatement("INSERT INTO ? VALUES (?, ?, ?, ?, ?)");
-            statement.setString(1, tableName);
-            statement.setString(2, user.getUsername());
-            statement.setString(3, user.getPassword());
-            statement.setString(4, user.getFirstName());
-            statement.setString(5, user.getLastName());
-            statement.setString(6, user.getIcNumber());
-//            String query = "INSERT INTO " + tableName + " VALUES ('" + user.getUsername() + "', '" + user.getPassword() + "', '" + user.getFirstName() + "', '" + user.getLastName() + "', '" + user.getIcNumber() + "')";
+        try(Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);) {
+            
+            PreparedStatement statement = conn.prepareStatement("INSERT INTO " + USER_TABLE_NAME + " VALUES (?, ?, ?, ?, ?)");
+            statement.setString(1, user.getUsername());
+            statement.setString(2, user.getPassword());
+            statement.setString(3, user.getFirstName());
+            statement.setString(4, user.getLastName());
+            statement.setInt(5, user.getIcNumber());
             statement.executeUpdate();
             success = true;
             
@@ -65,16 +63,20 @@ public class AuthObject extends UnicastRemoteObject implements AuthInterface {
     }
     
     
+    /**
+     * Returns true if login successful, and false if credentials are invalid
+     */
     @Override
     public boolean login(String username, String password) throws RemoteException {
         
         boolean success = false;
         
-        try (Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);) {
             
-            Statement statement = conn.createStatement();
-            String query = "SELECT * FROM " + tableName + " WHERE username = '" + username + "' AND password = '" + password + "'";
-            ResultSet passwordResults = statement.executeQuery(query);
+            PreparedStatement statement = conn.prepareStatement("SELECT * FROM " + USER_TABLE_NAME + " WHERE username = ? AND password = ?");
+            statement.setString(1, username);
+            statement.setString(2, password);
+            ResultSet passwordResults = statement.executeQuery();
             
             if(passwordResults.next()) {
                 success = true;
