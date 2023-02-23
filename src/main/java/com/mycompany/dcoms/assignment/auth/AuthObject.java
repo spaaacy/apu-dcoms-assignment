@@ -24,9 +24,10 @@ public class AuthObject extends UnicastRemoteObject implements AuthInterface {
     static final String DB_URL = "jdbc:derby://localhost:1527/KGF";
     static final String DB_USERNAME = "kgf";
     static final String DB_PASSWORD = "kgf";
+    
     static final String USER_TABLE_NAME = "TBLUSER";
     
-    AuthObject() throws RemoteException {
+    public AuthObject() throws RemoteException {
         super();
     }
     
@@ -76,9 +77,9 @@ public class AuthObject extends UnicastRemoteObject implements AuthInterface {
             PreparedStatement statement = conn.prepareStatement("SELECT * FROM " + USER_TABLE_NAME + " WHERE username = ? AND password = ?");
             statement.setString(1, username);
             statement.setString(2, password);
-            ResultSet passwordResults = statement.executeQuery();
+            ResultSet results = statement.executeQuery();
             
-            if(passwordResults.next()) {
+            if(results.next()) {
                 success = true;
             }
             

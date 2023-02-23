@@ -22,6 +22,12 @@ public class Order implements java.io.Serializable {
         this.productId = productId;
     }
 
+    public Order(Integer quantity, String username, Integer productId) {
+        this.quantity = quantity;
+        this.username = username;
+        this.productId = productId;
+    }
+
     public Integer getOrderId() {
         return orderId;
     }
