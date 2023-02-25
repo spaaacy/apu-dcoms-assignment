@@ -4,7 +4,7 @@
 
 package com.mycompany.dcoms.assignment.auth;
 
-import static com.mycompany.dcoms.assignment.auth.UsernameExistsException.SQL_PRIMARY_KEY_ERROR_CODE;
+import static com.mycompany.dcoms.assignment.auth.NonUniqueDetailsExeception.SQL_PRIMARY_KEY_ERROR_CODE;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.Connection;
@@ -38,7 +38,7 @@ public class AuthObject extends UnicastRemoteObject implements AuthInterface {
      * Returns true if registration successful, and false if username already exists
      */
     @Override
-    public boolean register(User user) throws RemoteException, UsernameExistsException {
+    public boolean register(User user) throws RemoteException, NonUniqueDetailsExeception {
         
         boolean success = false;
         
@@ -56,9 +56,9 @@ public class AuthObject extends UnicastRemoteObject implements AuthInterface {
         }
         catch (SQLException ex) {
             // SQLState 23505 represents instance where primary key pre-exists in table
-            
+            System.out.println(ex.getSQLState());
             if(ex.getSQLState().equals(SQL_PRIMARY_KEY_ERROR_CODE) ) {
-                throw new UsernameExistsException(ex);
+                throw new NonUniqueDetailsExeception(ex);
             }
         }
         

@@ -8,12 +8,12 @@ package com.mycompany.dcoms.assignment.auth;
  *
  * @author aakif
  */
-public class UsernameExistsException extends Exception {
+public class NonUniqueDetailsExeception extends Exception {
     
     static final String SQL_PRIMARY_KEY_ERROR_CODE = "23505";
     static String errorMessage = "Username already exists!";
     
-    UsernameExistsException(Exception ex) {
+    NonUniqueDetailsExeception(Exception ex) {
         super(errorMessage, ex);
     }
     

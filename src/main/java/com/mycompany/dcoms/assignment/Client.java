@@ -6,7 +6,7 @@ package com.mycompany.dcoms.assignment;
 
 import com.mycompany.dcoms.assignment.auth.AuthInterface;
 import com.mycompany.dcoms.assignment.auth.User;
-import com.mycompany.dcoms.assignment.auth.UsernameExistsException;
+import com.mycompany.dcoms.assignment.auth.NonUniqueDetailsExeception;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -41,9 +41,9 @@ public class Client {
         System.out.println("\tREGISTER");
         success = false;
         try {
-            User newUser = new User("spacy", "abc123", "aakif", "ahamath", 123456);
+            User newUser = new User("spacy1", "abc123", "aakif", "ahamath", 123456);
             success = authObject.register(newUser);
-        } catch (UsernameExistsException ex) {
+        } catch (NonUniqueDetailsExeception ex) {
             System.out.println("User already exists.");
         } finally {
             System.out.println("Register successful: " + success);
@@ -69,9 +69,13 @@ public class Client {
          */
         System.out.println("\n\tGET ORDERS");
         LinkedList<Order> allOrders = orderObject.getOrders("spacy");
-        for (Order nextOrder: allOrders) {
-            System.out.println("Order ID: " + nextOrder.getOrderId() + "\nQuantity: " + nextOrder.getQuantity() + 
-                    "\nUsername: " + nextOrder.getUsername() + "\nProduct ID: " + nextOrder.getProductId() + "\n");
+        if(!allOrders.isEmpty()) {
+                for (Order nextOrder: allOrders) {
+                System.out.println("Order ID: " + nextOrder.getOrderId() + "\nQuantity: " + nextOrder.getQuantity() + 
+                        "\nUsername: " + nextOrder.getUsername() + "\nProduct ID: " + nextOrder.getProductId() + "\n");
+            }
+        } else {
+            System.out.println("No orders found!");
         }
         
         /**
@@ -90,10 +94,14 @@ public class Client {
          * Sample Get Products
          */
         System.out.println("\n\tGET ALL PRODUCTS");
-        LinkedList<Product> fetchedProducts = productObject.getAllProducts();
-        for(Product nextProduct: fetchedProducts) {
-            System.out.println("Product ID: " + nextProduct.getProductId() + "\nProduct Name: " + nextProduct.getProductName() + 
-                    "\nPrice: " + nextProduct.getPrice() + "\nTotal Supply: " + nextProduct.getTotalSupply() + "\n");
+        LinkedList<Product> allProducts = productObject.getAllProducts();
+        if (!allProducts.isEmpty()) {
+            for(Product nextProduct: allProducts) {
+                System.out.println("Product ID: " + nextProduct.getProductId() + "\nProduct Name: " + nextProduct.getProductName() + 
+                        "\nPrice: " + nextProduct.getPrice() + "\nTotal Supply: " + nextProduct.getTotalSupply() + "\n");
+            }
+        } else {
+            System.out.println("No products found!");
         }
         
         

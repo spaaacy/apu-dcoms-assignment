@@ -1,3 +1,12 @@
-com\mycompany\dcoms\assignment\Interface.class
-com\mycompany\dcoms\assignment\Main.class
+com\mycompany\dcoms\assignment\order\OrderInterface.class
 com\mycompany\dcoms\assignment\Server.class
+com\mycompany\dcoms\assignment\product\Product.class
+com\mycompany\dcoms\assignment\product\ProductInterface.class
+com\mycompany\dcoms\assignment\auth\UsernameExistsException.class
+com\mycompany\dcoms\assignment\auth\AuthInterface.class
+com\mycompany\dcoms\assignment\Client.class
+com\mycompany\dcoms\assignment\order\OrderObject.class
+com\mycompany\dcoms\assignment\auth\AuthObject.class
+com\mycompany\dcoms\assignment\auth\User.class
+com\mycompany\dcoms\assignment\order\Order.class
+com\mycompany\dcoms\assignment\product\ProductObject.class
