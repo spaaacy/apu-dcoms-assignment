@@ -4,6 +4,7 @@
  */
 package com.mycompany.dcoms.assignment;
 
+import static com.mycompany.dcoms.assignment.Server.SERVER_PORT_NUMBER;
 import com.mycompany.dcoms.assignment.auth.AuthInterface;
 import com.mycompany.dcoms.assignment.auth.User;
 import com.mycompany.dcoms.assignment.auth.NonUniqueDetailsExeception;
@@ -15,6 +16,11 @@ import com.mycompany.dcoms.assignment.order.Order;
 import com.mycompany.dcoms.assignment.order.OrderInterface;
 import com.mycompany.dcoms.assignment.product.Product;
 import com.mycompany.dcoms.assignment.product.ProductInterface;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.rmi.UnknownHostException;
 import java.util.LinkedList;
 
 /**
@@ -40,11 +46,21 @@ public class Client {
          */
         System.out.println("\tREGISTER");
         success = false;
-        try {
-            User newUser = new User("spacy1", "abc123", "aakif", "ahamath", 123456);
-            success = authObject.register(newUser);
+        try {   
+            User newUser = new User("spacy1", "abc1234", "aakif", "ahamath", 123456);
+            success = authObject.register();
+            
+            Socket socket = new Socket("localhost", SERVER_PORT_NUMBER);
+            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+            oos.writeObject(newUser);
+            oos.flush();
+            oos.close();
+            socket.close();
+            
+            
         } catch (NonUniqueDetailsExeception ex) {
             System.out.println("User already exists.");
+        } catch (IOException ex) {
         } finally {
             System.out.println("Register successful: " + success);
         }

@@ -4,7 +4,13 @@
 
 package com.mycompany.dcoms.assignment.auth;
 
+import static com.mycompany.dcoms.assignment.Server.SERVER_PORT_NUMBER;
 import static com.mycompany.dcoms.assignment.auth.NonUniqueDetailsExeception.SQL_PRIMARY_KEY_ERROR_CODE;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.Connection;
@@ -38,18 +44,25 @@ public class AuthObject extends UnicastRemoteObject implements AuthInterface {
      * Returns true if registration successful, and false if username already exists
      */
     @Override
-    public boolean register(User user) throws RemoteException, NonUniqueDetailsExeception {
+    public boolean register() throws RemoteException, NonUniqueDetailsExeception {
+        
         
         boolean success = false;
         
         try(Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);) {
+
+            ServerSocket ss = new ServerSocket(SERVER_PORT_NUMBER);
+//            Socket socket = ss.accept();
+//            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+//            User user = (User)ois.readObject();
+            ss.close();
             
             PreparedStatement statement = conn.prepareStatement("INSERT INTO " + USER_TABLE_NAME + " VALUES (?, ?, ?, ?, ?)");
-            statement.setString(1, user.getUsername());
-            statement.setString(2, user.getPassword());
-            statement.setString(3, user.getFirstName());
-            statement.setString(4, user.getLastName());
-            statement.setInt(5, user.getIcNumber());
+//            statement.setString(1, user.getUsername());
+//            statement.setString(2, user.getPassword());
+//            statement.setString(3, user.getFirstName());
+//            statement.setString(4, user.getLastName());
+//            statement.setInt(5, user.getIcNumber());
             statement.executeUpdate();
             success = true;
             
@@ -60,8 +73,12 @@ public class AuthObject extends UnicastRemoteObject implements AuthInterface {
             if(ex.getSQLState().equals(SQL_PRIMARY_KEY_ERROR_CODE) ) {
                 throw new NonUniqueDetailsExeception(ex);
             }
+        } catch (IOException ex) {
+            System.out.println("IOException");
         }
-        
+//        catch (ClassNotFoundException  ex) {
+//            System.out.println("ClassNotFoundException");
+//        }
         return success;
         
     }
