@@ -18,10 +18,15 @@ import com.mycompany.dcoms.assignment.product.Product;
 import com.mycompany.dcoms.assignment.product.ProductInterface;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.rmi.UnknownHostException;
 import java.util.LinkedList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -33,52 +38,70 @@ public class Client {
     static final String ORDER_SERVER_NAME = "order";
     static final String PRODUCT_SERVER_NAME = "product";
     
-    public static void main(String[] args) throws NotBoundException, MalformedURLException, RemoteException {
+    static final Integer SERVER_PORT_NUMBER = 1050;    
+    static final Integer SOCKET_PORT_NUMBER = 1060;
+    static final String SERVER_ADDRESS = "rmi://localhost:" + SERVER_PORT_NUMBER;
+   
+    public static void main(String[] args) throws NotBoundException, MalformedURLException, RemoteException, InterruptedException {
         
-        AuthInterface authObject = (AuthInterface)Naming.lookup("rmi://localhost:1050/" + AUTH_SERVER_NAME);
-        OrderInterface orderObject = (OrderInterface)Naming.lookup("rmi://localhost:1050/" + ORDER_SERVER_NAME);
-        ProductInterface productObject = (ProductInterface)Naming.lookup("rmi://localhost:1050/" + PRODUCT_SERVER_NAME);
+        
+        AuthInterface authObject = (AuthInterface)Naming.lookup(SERVER_ADDRESS + "/" + AUTH_SERVER_NAME);
+        OrderInterface orderObject = (OrderInterface)Naming.lookup(SERVER_ADDRESS + "/" + ORDER_SERVER_NAME);
+        ProductInterface productObject = (ProductInterface)Naming.lookup(SERVER_ADDRESS + "/" + PRODUCT_SERVER_NAME);
            
-        boolean success = false;
-        
         /**
          * Sample Register
          */
         System.out.println("\tREGISTER");
-        success = false;
-        try {   
-            User newUser = new User("spacy1", "abc1234", "aakif", "ahamath", 123456);
-            success = authObject.register();
-            
-            Socket socket = new Socket("localhost", SERVER_PORT_NUMBER);
-            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-            oos.writeObject(newUser);
-            oos.flush();
-            oos.close();
-            socket.close();
-            
-            
-        } catch (NonUniqueDetailsExeception ex) {
-            System.out.println("User already exists.");
-        } catch (IOException ex) {
-        } finally {
-            System.out.println("Register successful: " + success);
-        }
+        
+        // Makes the call and output the results
+        Runnable registerThread1 = () -> {
+                boolean success = false;
+                try {
+                    success = authObject.register();
+                } catch (NonUniqueDetailsExeception ex) {
+                    System.out.println("Username/IC already exists");
+                } catch (RemoteException ex) {
+                } finally {
+                    System.out.println("Register successful: " + success);
+                }
+        };
+        
+        // Only connects to socket to feed data
+        Runnable registerThread2 = () -> {
+            User newUser = new User("test9", "abc1234", "aakif", "ahamath", (int)(Math.random()*10000));
+            try {  
+                Socket socket = new Socket("localhost", SOCKET_PORT_NUMBER);
+                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                oos.writeObject(newUser);
+                oos.flush();
+                oos.close();
+                socket.close();
+            } catch (IOException ex) {}
+        };
+        
+        // Executes both thread in correct order and waits for completion
+        ScheduledExecutorService register = Executors.newScheduledThreadPool(2);
+        register.submit(registerThread1);
+        register.schedule(registerThread2, 500, TimeUnit.MILLISECONDS);
+        register.shutdown();
+        register.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+        
         
         /**
          * Sample Login
          */
         System.out.println("\n\tLOGIN");
-        success = authObject.login("spacy", "abc123");
-        System.out.println("Login successful: " + success);
+        boolean loginSuccess = authObject.login("spacy", "abc123");
+        System.out.println("Login successful: " + loginSuccess);
       
         /**
          * Sample Create Order
          */
         System.out.println("\n\tCREATE ORDER");
         Order newOrder = new Order(22, "spacy", 4);
-        success = orderObject.createOrder(newOrder);
-        System.out.println("Order successful: " + success);
+        boolean orderSuccess = orderObject.createOrder(newOrder);
+        System.out.println("Order successful: " + orderSuccess);
 
         /**
          * Sample Get Orders
@@ -121,6 +144,7 @@ public class Client {
         }
         
         
+                
     }
     
 }

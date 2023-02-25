@@ -6,10 +6,15 @@ package com.mycompany.dcoms.assignment;
 
 import com.mycompany.dcoms.assignment.auth.AuthInterface;
 import com.mycompany.dcoms.assignment.auth.AuthObject;
+import com.mycompany.dcoms.assignment.auth.User;
 import com.mycompany.dcoms.assignment.order.OrderInterface;
 import com.mycompany.dcoms.assignment.order.OrderObject;
 import com.mycompany.dcoms.assignment.product.ProductInterface;
 import com.mycompany.dcoms.assignment.product.ProductObject;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -24,6 +29,7 @@ public class Server {
     static final String ORDER_SERVER_NAME = "order";
     static final String PRODUCT_SERVER_NAME = "product";
     public static final Integer SERVER_PORT_NUMBER = 1050;
+    public static final Integer SOCKET_PORT_NUMBER = 1060;
     
     public static void main(String[] args) throws RemoteException {
         
