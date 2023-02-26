@@ -4,6 +4,14 @@
  */
 package com.mycompany.dcoms.assignment.order;
 
+import static com.mycompany.dcoms.assignment.Server.SOCKET_PORT_NUMBER;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.Connection;
@@ -13,6 +21,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -34,11 +44,18 @@ public class OrderObject extends UnicastRemoteObject implements OrderInterface {
     }
     
     @Override
-    public boolean createOrder(Order order) throws RemoteException {
+    public void createOrder() throws RemoteException {
         
         boolean success = false;
+        ServerSocket ss = null;
+        Socket socket = null;
         
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            
+            ss = new ServerSocket(SOCKET_PORT_NUMBER);
+            socket = ss.accept();
+            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+            Order order = (Order)ois.readObject();
             
             PreparedStatement statement = conn.prepareStatement(
                     "INSERT INTO " + ORDER_TABLE_NAME + ""
@@ -51,19 +68,39 @@ public class OrderObject extends UnicastRemoteObject implements OrderInterface {
             success = true;
             
         } catch (SQLException ex ) {
-            System.out.println(ex.getSQLState());
+            System.out.println("SQLException: " + ex.getSQLState());
+        } catch (IOException ex ) {
+            System.out.println("IOException");
+        } catch (ClassNotFoundException ex) {
+            System.out.println("ClassNotFoundException");
+        } finally {
+            
+            try {
+                DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+                dos.writeBoolean(success);
+                dos.flush();
+                dos.close();
+                socket.close();
+            } catch (IOException ex) {
+                System.out.println("IOException");
+            }
         }
-        
-        return success;
         
     }
 
     @Override
-    public LinkedList<Order> getOrders(String username) throws RemoteException {
+    public void getOrders() throws RemoteException {
         
         LinkedList<Order> allOrders = new LinkedList<Order>();
+        ServerSocket ss = null;
+        Socket socket = null;
         
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            
+            ss = new ServerSocket(SOCKET_PORT_NUMBER);
+            socket = ss.accept();
+            DataInputStream dis = new DataInputStream(socket.getInputStream());
+            String username = dis.readUTF();
             
             PreparedStatement statement = conn.prepareStatement("SELECT * FROM " + ORDER_TABLE_NAME + " WHERE " + USERNAME_COLUMN_NAME + " = ?");
             statement.setString(1, username);
@@ -80,9 +117,23 @@ public class OrderObject extends UnicastRemoteObject implements OrderInterface {
             }
             
             
-        } catch (SQLException ex) {}
-        
-        return allOrders;
+        } catch (SQLException ex) {
+            System.out.println("SQLException: " + ex.getSQLState());
+        } catch (IOException ex) {
+            System.out.println("IOException");
+        }finally {
+            
+            try {
+                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                oos.writeObject(allOrders);
+                oos.flush();
+                oos.close();
+                socket.close();
+            } catch (IOException ex) {
+                System.out.println("IOException");
+            }
+            
+        }
         
     }
     

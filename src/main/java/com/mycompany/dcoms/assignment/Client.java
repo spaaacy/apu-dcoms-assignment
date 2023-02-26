@@ -4,26 +4,23 @@
  */
 package com.mycompany.dcoms.assignment;
 
-import static com.mycompany.dcoms.assignment.Server.SERVER_PORT_NUMBER;
 import com.mycompany.dcoms.assignment.auth.AuthInterface;
 import com.mycompany.dcoms.assignment.auth.User;
 import com.mycompany.dcoms.assignment.auth.NonUniqueDetailsExeception;
+import com.mycompany.dcoms.assignment.order.Order;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import com.mycompany.dcoms.assignment.order.Order;
 import com.mycompany.dcoms.assignment.order.OrderInterface;
-import com.mycompany.dcoms.assignment.product.Product;
 import com.mycompany.dcoms.assignment.product.ProductInterface;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.rmi.UnknownHostException;
 import java.util.LinkedList;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +38,7 @@ public class Client {
     static final String PRODUCT_SERVER_NAME = "product";
     
     static final Integer SERVER_PORT_NUMBER = 1050;    
-    static final Integer SOCKET_PORT_NUMBER = 1060;
+    static final Integer SOCKET_PORT = 1060;
     static final String HOST_ADDRESS = "localhost";
     static final String SERVER_ADDRESS = "rmi://" + HOST_ADDRESS + ":" + SERVER_PORT_NUMBER;
    
@@ -52,116 +49,193 @@ public class Client {
         OrderInterface orderObject = (OrderInterface)Naming.lookup(SERVER_ADDRESS + "/" + ORDER_SERVER_NAME);
         ProductInterface productObject = (ProductInterface)Naming.lookup(SERVER_ADDRESS + "/" + PRODUCT_SERVER_NAME);
            
-        /**
-         * Sample Register
-         */
-        System.out.println("\tREGISTER");
+//        /**
+//         * Sample Register
+//         */
+//        System.out.println("\tREGISTER");
+//        
+//        // Makes the call to using RMI
+//        Runnable registerThread1 = () -> {
+//                try {
+//                    authObject.register();
+//                } catch (NonUniqueDetailsExeception ex) {
+//                    System.out.println("Username/IC already exists");
+//                } catch (RemoteException ex) {
+//                    System.out.println("RemoteException");
+//                }
+//        };
+//        
+//        // Uses socket to feed and retrieve data
+//        Runnable registerThread2 = () -> {
+//            User newUser = new User("test0", "abc123", "aakif", "ahamath", (int)(Math.random()*10000));
+//            boolean success = false;
+//            try {  
+//                Socket socket = new Socket(HOST_ADDRESS, SOCKET_PORT_NUMBER);
+//                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+//                oos.writeObject(newUser);
+//                oos.flush();
+//                
+//                DataInputStream dis = new DataInputStream(socket.getInputStream());
+//                success = dis.readBoolean();
+//                oos.close();
+//                socket.close();
+//            } catch (IOException ex) {
+//                System.out.println("IOException");
+//                System.out.println(ex.getCause() + ex.getMessage());
+//            } finally {
+//                System.out.println("Register successful: " + success);
+//            }
+//        };
+//        
+//        // Thread pool to ensure correct timing and completion of process before continuation
+//        ScheduledExecutorService register = Executors.newScheduledThreadPool(2);
+//        register.submit(registerThread1);
+//        register.schedule(registerThread2, 500, TimeUnit.MILLISECONDS);
+//        register.shutdown();
+//        register.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
         
-        // Makes the call and output the results
-        Runnable registerThread1 = () -> {
-                try {
-                    authObject.register();
-                } catch (NonUniqueDetailsExeception ex) {
-                    System.out.println("Username/IC already exists");
-                } catch (RemoteException ex) {
-                    System.out.println("RemoteException");
-                }
-        };
         
-        // Only connects to socket to feed data
-        Runnable registerThread2 = () -> {
-            User newUser = new User("test0", "abc123", "aakif", "ahamath", (int)(Math.random()*10000));
-            boolean success = false;
-            try {  
-                Socket socket = new Socket(HOST_ADDRESS, SOCKET_PORT_NUMBER);
-                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-                oos.writeObject(newUser);
-                oos.flush();
-                
-                DataInputStream dis = new DataInputStream(socket.getInputStream());
-                success = dis.readBoolean();
-                oos.close();
-                socket.close();
-            } catch (IOException ex) {
-                System.out.println("IOException");
-                System.out.println(ex.getCause() + ex.getMessage());
-            } finally {
-                System.out.println("Register successful: " + success);
-            }
-        };
-        
-        // Executes both thread in correct order and waits for completion
-        ScheduledExecutorService register = Executors.newScheduledThreadPool(2);
-        register.submit(registerThread1);
-        register.schedule(registerThread2, 500, TimeUnit.MILLISECONDS);
-        register.shutdown();
-        register.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
-        
-        
-        /**
-         * Sample Login
-         */
-        System.out.println("\n\tLOGIN");
-        
-        Runnable loginThread1 = () -> {
-            try {
-                authObject.login();
-            } catch (RemoteException ex) {
-                System.out.println("RemoteException");
-            }
-        };
-        
-        Runnable loginThread2 = () -> {
-            boolean success = false;
-            String username = "test0";
-            String password = "abc123";
-            try {
-                Socket socket = new Socket(HOST_ADDRESS, SOCKET_PORT_NUMBER);
-                DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
-                dos.writeUTF(username);
-                dos.writeUTF(password);
-                
-                DataInputStream dis = new DataInputStream(socket.getInputStream());
-                success = dis.readBoolean();
-                dos.flush();
-                dos.close();
-                socket.close();
-            } catch (IOException ex) {
-                System.out.println("IOException");
-            } finally {
-                System.out.println("Login successful: " + success);
-            }
-        };
-
-        ScheduledExecutorService login = Executors.newScheduledThreadPool(2);
-        login.submit(loginThread1);
-        login.schedule(loginThread2, 500, TimeUnit.MILLISECONDS);
-        login.shutdown();
-        login.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+//        /**
+//         * Sample Login
+//         */
+//        System.out.println("\n\tLOGIN");
+//        
+//        // Makes the call to using RMI
+//        Runnable loginThread1 = () -> {
+//            try {
+//                authObject.login();
+//            } catch (RemoteException ex) {
+//                System.out.println("RemoteException");
+//            }
+//        };
+//        
+//        // Uses socket to feed and retrieve data
+//        Runnable loginThread2 = () -> {
+//            boolean success = false;
+//            String username = "test0";
+//            String password = "abc123";
+//            try {
+//                Socket socket = new Socket(HOST_ADDRESS, SOCKET_PORT_NUMBER);
+//                DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+//                dos.writeUTF(username);
+//                dos.writeUTF(password);
+//                dos.flush();
+//                
+//                DataInputStream dis = new DataInputStream(socket.getInputStream());
+//                success = dis.readBoolean();
+//                dos.close();
+//                socket.close();
+//            } catch (IOException ex) {
+//                System.out.println("IOException");
+//            } finally {
+//                System.out.println("Login successful: " + success);
+//            }
+//        };
+//
+//        // Thread pool to ensure correct timing and completion of process before continuation
+//        ScheduledExecutorService login = Executors.newScheduledThreadPool(2);
+//        login.submit(loginThread1);
+//        login.schedule(loginThread2, 500, TimeUnit.MILLISECONDS);
+//        login.shutdown();
+//        login.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
         
         
 //        /**
 //         * Sample Create Order
 //         */
 //        System.out.println("\n\tCREATE ORDER");
-//        Order newOrder = new Order(22, "spacy", 4);
-//        boolean orderSuccess = orderObject.createOrder(newOrder);
-//        System.out.println("Order successful: " + orderSuccess);
-//
+//        
+//        
+//        // Makes the call using RMI
+//        Runnable createOrderThread1 = () -> {
+//            try {
+//                orderObject.createOrder();
+//            } catch (RemoteException ex) {
+//                System.out.println("RemoteException");
+//            }
+//        };
+//        
+//        // Uses socket to feed and retrieve data
+//        Runnable createOrderThread2 = () -> {
+//            Order newOrder = new Order(1, "spacy", 1);
+//            boolean success = false;
+//            try {
+//                Socket socket = new Socket(HOST_ADDRESS, SOCKET_PORT);
+//                ObjectOutputStream ois = new ObjectOutputStream(socket.getOutputStream());
+//                ois.writeObject(newOrder);
+//                ois.flush();
+//                
+//                DataInputStream dis = new DataInputStream(socket.getInputStream());
+//                success = dis.readBoolean();
+//                ois.close();
+//                socket.close();
+//            } catch (IOException ex) {
+//                System.out.println("IOException");
+//            } finally {
+//                System.out.println("Order successful: " + success);
+//            }
+//        };
+//        
+//        // Thread pool to ensure correct timing and completion of process before continuation
+//        ScheduledExecutorService createOrder = Executors.newScheduledThreadPool(2);
+//        createOrder.submit(createOrderThread1);
+//        createOrder.schedule(createOrderThread2, 500, TimeUnit.MILLISECONDS);
+//        createOrder.shutdown();
+//        createOrder.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+
 //        /**
 //         * Sample Get Orders
 //         */
 //        System.out.println("\n\tGET ORDERS");
-//        LinkedList<Order> allOrders = orderObject.getOrders("spacy");
-//        if(!allOrders.isEmpty()) {
-//                for (Order nextOrder: allOrders) {
-//                System.out.println("Order ID: " + nextOrder.getOrderId() + "\nQuantity: " + nextOrder.getQuantity() + 
-//                        "\nUsername: " + nextOrder.getUsername() + "\nProduct ID: " + nextOrder.getProductId() + "\n");
-//            }
-//        } else {
-//            System.out.println("No orders found!");
-//        }
 //        
+//        // Makes the call using RMI
+//        Runnable getOrdersThread1 = () -> {
+//            try {
+//                orderObject.getOrders();
+//            } catch (RemoteException ex) {
+//                System.out.println("RemoteException");
+//            }
+//        };
+//        
+//        // Uses socket to feed and retrieve data
+//        Runnable getOrdersThread2 = () -> {
+//            LinkedList<Order> allOrders = new LinkedList<Order>();
+//            try {
+//                String username = "spacy";
+//                Socket socket = new Socket(HOST_ADDRESS, SOCKET_PORT);
+//                DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+//                dos.writeUTF(username);
+//                dos.flush();
+//                
+//                ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+//                allOrders = (LinkedList<Order>)ois.readObject();
+//                dos.close();
+//                socket.close();
+//            } catch (IOException ex) {
+//                System.out.println("IOException");
+//            } catch (ClassNotFoundException ex) {
+//                System.out.println("ClassNotFoundException");
+//            } finally {
+//                if (!allOrders.isEmpty()) {
+//                    for (Order nextOrder : allOrders) {
+//                        System.out.println("Order ID: " + nextOrder.getOrderId() + "\nQuantity: " + nextOrder.getQuantity()
+//                                + "\nUsername: " + nextOrder.getUsername() + "\nProduct ID: " + nextOrder.getProductId() + "\n");
+//                    }
+//                } else {
+//                    System.out.println("No orders found!");
+//                }
+//            }
+//        };
+//        
+//        // Thread pool to ensure correct timing and completion of process before continuation
+//        ScheduledExecutorService getOrders = Executors.newScheduledThreadPool(2);
+//        getOrders.submit(getOrdersThread1);
+//        getOrders.schedule(getOrdersThread2, 500, TimeUnit.MILLISECONDS);
+//        getOrders.shutdown();
+//        getOrders.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+        
+        
+        
 //        /**
 //         * Sample Get Product
 //         */
