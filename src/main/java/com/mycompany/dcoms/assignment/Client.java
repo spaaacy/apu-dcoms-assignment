@@ -16,6 +16,8 @@ import com.mycompany.dcoms.assignment.order.Order;
 import com.mycompany.dcoms.assignment.order.OrderInterface;
 import com.mycompany.dcoms.assignment.product.Product;
 import com.mycompany.dcoms.assignment.product.ProductInterface;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -40,7 +42,8 @@ public class Client {
     
     static final Integer SERVER_PORT_NUMBER = 1050;    
     static final Integer SOCKET_PORT_NUMBER = 1060;
-    static final String SERVER_ADDRESS = "rmi://localhost:" + SERVER_PORT_NUMBER;
+    static final String HOST_ADDRESS = "localhost";
+    static final String SERVER_ADDRESS = "rmi://" + HOST_ADDRESS + ":" + SERVER_PORT_NUMBER;
    
     public static void main(String[] args) throws NotBoundException, MalformedURLException, RemoteException, InterruptedException {
         
@@ -56,28 +59,35 @@ public class Client {
         
         // Makes the call and output the results
         Runnable registerThread1 = () -> {
-                boolean success = false;
                 try {
-                    success = authObject.register();
+                    authObject.register();
                 } catch (NonUniqueDetailsExeception ex) {
                     System.out.println("Username/IC already exists");
                 } catch (RemoteException ex) {
-                } finally {
-                    System.out.println("Register successful: " + success);
+                    System.out.println("RemoteException");
                 }
         };
         
         // Only connects to socket to feed data
         Runnable registerThread2 = () -> {
-            User newUser = new User("test9", "abc1234", "aakif", "ahamath", (int)(Math.random()*10000));
+            User newUser = new User("test0", "abc123", "aakif", "ahamath", (int)(Math.random()*10000));
+            boolean success = false;
             try {  
-                Socket socket = new Socket("localhost", SOCKET_PORT_NUMBER);
+                Socket socket = new Socket(HOST_ADDRESS, SOCKET_PORT_NUMBER);
                 ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
                 oos.writeObject(newUser);
                 oos.flush();
+                
+                DataInputStream dis = new DataInputStream(socket.getInputStream());
+                success = dis.readBoolean();
                 oos.close();
                 socket.close();
-            } catch (IOException ex) {}
+            } catch (IOException ex) {
+                System.out.println("IOException");
+                System.out.println(ex.getCause() + ex.getMessage());
+            } finally {
+                System.out.println("Register successful: " + success);
+            }
         };
         
         // Executes both thread in correct order and waits for completion
@@ -92,59 +102,92 @@ public class Client {
          * Sample Login
          */
         System.out.println("\n\tLOGIN");
-        boolean loginSuccess = authObject.login("spacy", "abc123");
-        System.out.println("Login successful: " + loginSuccess);
-      
-        /**
-         * Sample Create Order
-         */
-        System.out.println("\n\tCREATE ORDER");
-        Order newOrder = new Order(22, "spacy", 4);
-        boolean orderSuccess = orderObject.createOrder(newOrder);
-        System.out.println("Order successful: " + orderSuccess);
-
-        /**
-         * Sample Get Orders
-         */
-        System.out.println("\n\tGET ORDERS");
-        LinkedList<Order> allOrders = orderObject.getOrders("spacy");
-        if(!allOrders.isEmpty()) {
-                for (Order nextOrder: allOrders) {
-                System.out.println("Order ID: " + nextOrder.getOrderId() + "\nQuantity: " + nextOrder.getQuantity() + 
-                        "\nUsername: " + nextOrder.getUsername() + "\nProduct ID: " + nextOrder.getProductId() + "\n");
+        
+        Runnable loginThread1 = () -> {
+            try {
+                authObject.login();
+            } catch (RemoteException ex) {
+                System.out.println("RemoteException");
             }
-        } else {
-            System.out.println("No orders found!");
-        }
+        };
         
-        /**
-         * Sample Get Product
-         */
-        System.out.println("\n\tGET SINGLE PRODUCT");
-        Product fetchedProduct = productObject.getProduct(1);
-        try {
-            System.out.println("Product ID: " + fetchedProduct.getProductId() + "\nProduct Name: " + fetchedProduct.getProductName() + 
-                    "\nPrice: " + fetchedProduct.getPrice() + "\nTotal Supply: " + fetchedProduct.getTotalSupply());
-        } catch (NullPointerException ex) {
-            System.out.println("Product not found!");
-        }
-
-        /**
-         * Sample Get Products
-         */
-        System.out.println("\n\tGET ALL PRODUCTS");
-        LinkedList<Product> allProducts = productObject.getAllProducts();
-        if (!allProducts.isEmpty()) {
-            for(Product nextProduct: allProducts) {
-                System.out.println("Product ID: " + nextProduct.getProductId() + "\nProduct Name: " + nextProduct.getProductName() + 
-                        "\nPrice: " + nextProduct.getPrice() + "\nTotal Supply: " + nextProduct.getTotalSupply() + "\n");
-            }
-        } else {
-            System.out.println("No products found!");
-        }
-        
-        
+        Runnable loginThread2 = () -> {
+            boolean success = false;
+            String username = "test0";
+            String password = "abc123";
+            try {
+                Socket socket = new Socket(HOST_ADDRESS, SOCKET_PORT_NUMBER);
+                DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+                dos.writeUTF(username);
+                dos.writeUTF(password);
                 
+                DataInputStream dis = new DataInputStream(socket.getInputStream());
+                success = dis.readBoolean();
+                dos.flush();
+                dos.close();
+                socket.close();
+            } catch (IOException ex) {
+                System.out.println("IOException");
+            } finally {
+                System.out.println("Login successful: " + success);
+            }
+        };
+
+        ScheduledExecutorService login = Executors.newScheduledThreadPool(2);
+        login.submit(loginThread1);
+        login.schedule(loginThread2, 500, TimeUnit.MILLISECONDS);
+        login.shutdown();
+        login.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+        
+        
+//        /**
+//         * Sample Create Order
+//         */
+//        System.out.println("\n\tCREATE ORDER");
+//        Order newOrder = new Order(22, "spacy", 4);
+//        boolean orderSuccess = orderObject.createOrder(newOrder);
+//        System.out.println("Order successful: " + orderSuccess);
+//
+//        /**
+//         * Sample Get Orders
+//         */
+//        System.out.println("\n\tGET ORDERS");
+//        LinkedList<Order> allOrders = orderObject.getOrders("spacy");
+//        if(!allOrders.isEmpty()) {
+//                for (Order nextOrder: allOrders) {
+//                System.out.println("Order ID: " + nextOrder.getOrderId() + "\nQuantity: " + nextOrder.getQuantity() + 
+//                        "\nUsername: " + nextOrder.getUsername() + "\nProduct ID: " + nextOrder.getProductId() + "\n");
+//            }
+//        } else {
+//            System.out.println("No orders found!");
+//        }
+//        
+//        /**
+//         * Sample Get Product
+//         */
+//        System.out.println("\n\tGET SINGLE PRODUCT");
+//        Product fetchedProduct = productObject.getProduct(1);
+//        try {
+//            System.out.println("Product ID: " + fetchedProduct.getProductId() + "\nProduct Name: " + fetchedProduct.getProductName() + 
+//                    "\nPrice: " + fetchedProduct.getPrice() + "\nTotal Supply: " + fetchedProduct.getTotalSupply());
+//        } catch (NullPointerException ex) {
+//            System.out.println("Product not found!");
+//        }
+//
+//        /**
+//         * Sample Get Products
+//         */
+//        System.out.println("\n\tGET ALL PRODUCTS");
+//        LinkedList<Product> allProducts = productObject.getAllProducts();
+//        if (!allProducts.isEmpty()) {
+//            for(Product nextProduct: allProducts) {
+//                System.out.println("Product ID: " + nextProduct.getProductId() + "\nProduct Name: " + nextProduct.getProductName() + 
+//                        "\nPrice: " + nextProduct.getPrice() + "\nTotal Supply: " + nextProduct.getTotalSupply() + "\n");
+//            }
+//        } else {
+//            System.out.println("No products found!");
+//        }
+        
     }
     
 }

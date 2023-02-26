@@ -28,6 +28,7 @@ public class Server {
     static final String AUTH_SERVER_NAME = "auth";
     static final String ORDER_SERVER_NAME = "order";
     static final String PRODUCT_SERVER_NAME = "product";
+    
     public static final Integer SERVER_PORT_NUMBER = 1050;
     public static final Integer SOCKET_PORT_NUMBER = 1060;
     
