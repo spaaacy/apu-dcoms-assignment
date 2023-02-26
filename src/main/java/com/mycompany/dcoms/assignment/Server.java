@@ -30,7 +30,7 @@ public class Server {
     static final String PRODUCT_SERVER_NAME = "product";
     
     public static final Integer SERVER_PORT_NUMBER = 1050;
-    public static final Integer SOCKET_PORT_NUMBER = 1060;
+    public static final Integer SOCKET_PORT = 1060;
     
     public static void main(String[] args) throws RemoteException {
         

@@ -14,7 +14,7 @@ import java.util.LinkedList;
  */
 public interface ProductInterface extends Remote {
     
-    public LinkedList<Product> getAllProducts() throws RemoteException;
-    public Product getProduct(Integer productId) throws RemoteException;
+    public void getAllProducts() throws RemoteException;
+    public void getProduct() throws RemoteException;
     
 }

@@ -4,7 +4,6 @@
 
 package com.mycompany.dcoms.assignment.auth;
 
-import static com.mycompany.dcoms.assignment.Server.SOCKET_PORT_NUMBER;
 import static com.mycompany.dcoms.assignment.auth.NonUniqueDetailsExeception.SQL_PRIMARY_KEY_ERROR_CODE;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -19,6 +18,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import static com.mycompany.dcoms.assignment.Server.SOCKET_PORT;
 
 /**
  *
@@ -50,7 +50,7 @@ public class AuthObject extends UnicastRemoteObject implements AuthInterface {
         
         
         try(Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);) {
-            ss = new ServerSocket(SOCKET_PORT_NUMBER);
+            ss = new ServerSocket(SOCKET_PORT);
             socket = ss.accept();
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
             User user = (User)ois.readObject();
@@ -103,7 +103,7 @@ public class AuthObject extends UnicastRemoteObject implements AuthInterface {
         
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);) {
             
-            ss = new ServerSocket(SOCKET_PORT_NUMBER);
+            ss = new ServerSocket(SOCKET_PORT);
             socket = ss.accept();
             DataInputStream dis = new DataInputStream(socket.getInputStream());
             String username = (String)dis.readUTF();

@@ -13,6 +13,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import com.mycompany.dcoms.assignment.order.OrderInterface;
+import com.mycompany.dcoms.assignment.product.Product;
 import com.mycompany.dcoms.assignment.product.ProductInterface;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -240,27 +241,97 @@ public class Client {
 //         * Sample Get Product
 //         */
 //        System.out.println("\n\tGET SINGLE PRODUCT");
-//        Product fetchedProduct = productObject.getProduct(1);
-//        try {
-//            System.out.println("Product ID: " + fetchedProduct.getProductId() + "\nProduct Name: " + fetchedProduct.getProductName() + 
-//                    "\nPrice: " + fetchedProduct.getPrice() + "\nTotal Supply: " + fetchedProduct.getTotalSupply());
-//        } catch (NullPointerException ex) {
-//            System.out.println("Product not found!");
-//        }
-//
-//        /**
-//         * Sample Get Products
-//         */
-//        System.out.println("\n\tGET ALL PRODUCTS");
-//        LinkedList<Product> allProducts = productObject.getAllProducts();
-//        if (!allProducts.isEmpty()) {
-//            for(Product nextProduct: allProducts) {
-//                System.out.println("Product ID: " + nextProduct.getProductId() + "\nProduct Name: " + nextProduct.getProductName() + 
-//                        "\nPrice: " + nextProduct.getPrice() + "\nTotal Supply: " + nextProduct.getTotalSupply() + "\n");
+//        
+//        // Makes the call using RMI
+//        Runnable getProductThread1 = () -> {
+//            try {
+//                productObject.getProduct();
+//            } catch (RemoteException ex) {
+//                System.out.println("RemoteException");
 //            }
-//        } else {
-//            System.out.println("No products found!");
-//        }
+//        };
+//
+//        // Uses socket to feed and retrieve data
+//        Runnable getProductThread2 = () -> {
+//            Integer productId = 3;
+//            Product fetchedProduct = null;
+//            try {
+//                Socket socket = new Socket(HOST_ADDRESS, SOCKET_PORT);
+//                DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+//                dos.writeInt(productId);
+//                dos.flush();
+//                
+//                ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+//                fetchedProduct = (Product)ois.readObject();
+//                dos.close();
+//                socket.close();
+//            } catch (IOException ex ) {
+//                System.out.println("IOException");
+//            } catch (ClassNotFoundException ex) {
+//                System.out.println("ClassNotFoundException");
+//            }finally {
+//                try {
+//                    System.out.println("Product ID: " + fetchedProduct.getProductId() + "\nProduct Name: " + fetchedProduct.getProductName()
+//                            + "\nPrice: " + fetchedProduct.getPrice() + "\nTotal Supply: " + fetchedProduct.getTotalSupply());
+//                } catch (NullPointerException ex) {
+//                    System.out.println("Product not found!");
+//                }
+//            }
+//        };
+//        
+//        // Thread pool to ensure correct timing and completion of process before continuation
+//        ScheduledExecutorService getProduct = Executors.newScheduledThreadPool(2);
+//        getProduct.submit(getProductThread1);
+//        getProduct.schedule(getProductThread2, 500, TimeUnit.MILLISECONDS);
+//        getProduct.shutdown();
+//        getProduct.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+
+        /**
+         * Sample Get Products
+         */
+        System.out.println("\n\tGET ALL PRODUCTS");
+        
+        // Makes the call using RMI
+        Runnable getAllProductsThread1 = () -> {
+            try {
+                productObject.getAllProducts();
+            } catch (RemoteException ex) {
+                System.out.println("RemoteException");
+            }
+        };
+        
+        // Uses socket to feed and retrieve data
+        Runnable getAllProductsThread2 = () -> {
+            LinkedList<Product> allProducts = new LinkedList<Product>();
+            try {
+                Socket socket = new Socket(HOST_ADDRESS, SOCKET_PORT);
+                
+                ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+                allProducts = (LinkedList<Product>)ois.readObject();
+                ois.close();
+                socket.close();
+            } catch (IOException ex) {
+                System.out.println("IOException");
+            } catch (ClassNotFoundException ex) {
+                System.out.println("ClassNotFoundException");
+            } finally {
+                if (!allProducts.isEmpty()) {
+                    for (Product nextProduct : allProducts) {
+                        System.out.println("Product ID: " + nextProduct.getProductId() + "\nProduct Name: " + nextProduct.getProductName()
+                                + "\nPrice: " + nextProduct.getPrice() + "\nTotal Supply: " + nextProduct.getTotalSupply() + "\n");
+                    }
+                } else {
+                    System.out.println("No products found!");
+                }
+            }
+        };
+        
+        // Thread pool to ensure correct timing and completion of process before continuation
+        ScheduledExecutorService getAllProducts = Executors.newScheduledThreadPool(2);
+        getAllProducts.submit(getAllProductsThread1);
+        getAllProducts.schedule(getAllProductsThread2, 500, TimeUnit.MILLISECONDS);
+        getAllProducts.shutdown();
+        getAllProducts.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
         
     }
     

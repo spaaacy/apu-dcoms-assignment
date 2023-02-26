@@ -4,7 +4,6 @@
  */
 package com.mycompany.dcoms.assignment.order;
 
-import static com.mycompany.dcoms.assignment.Server.SOCKET_PORT_NUMBER;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -23,6 +22,7 @@ import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static com.mycompany.dcoms.assignment.Server.SOCKET_PORT;
 
 /**
  *
@@ -52,7 +52,7 @@ public class OrderObject extends UnicastRemoteObject implements OrderInterface {
         
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
             
-            ss = new ServerSocket(SOCKET_PORT_NUMBER);
+            ss = new ServerSocket(SOCKET_PORT);
             socket = ss.accept();
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
             Order order = (Order)ois.readObject();
@@ -97,7 +97,7 @@ public class OrderObject extends UnicastRemoteObject implements OrderInterface {
         
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
             
-            ss = new ServerSocket(SOCKET_PORT_NUMBER);
+            ss = new ServerSocket(SOCKET_PORT);
             socket = ss.accept();
             DataInputStream dis = new DataInputStream(socket.getInputStream());
             String username = dis.readUTF();

@@ -12,6 +12,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
+import static com.mycompany.dcoms.assignment.Server.SOCKET_PORT;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -31,11 +39,16 @@ public class ProductObject extends UnicastRemoteObject implements ProductInterfa
     }
 
     @Override
-    public LinkedList<Product> getAllProducts() throws RemoteException {
+    public void getAllProducts() throws RemoteException {
         
         LinkedList<Product> fetchedProducts = new LinkedList<Product>();
+        ServerSocket ss = null;
+        Socket socket = null;
         
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            
+            ss = new ServerSocket(SOCKET_PORT);
+            socket = ss.accept();
             
             PreparedStatement statement = conn.prepareStatement("SELECT * FROM " + PRODUCT_TABLE_NAME);
             ResultSet results = statement.executeQuery();
@@ -50,21 +63,41 @@ public class ProductObject extends UnicastRemoteObject implements ProductInterfa
                 fetchedProducts.add(fetchedProduct);
             }
             
-        } catch (SQLException ex) {}
-        
-        return fetchedProducts;
-        
+        } catch (SQLException ex) {
+            System.out.println("SQLException: " + ex.getSQLState());
+        } catch (IOException ex ) {
+            System.out.println("IOException");
+        } finally {
+            
+            try {
+                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                oos.writeObject(fetchedProducts);
+                oos.flush();
+                oos.close();
+                socket.close();
+            } catch (IOException ex) {
+                System.out.println("IOException");
+            }
+            
+        }
     }
 
     /**
      * Fetches product details using product ID, will return a NULL pointer if not matches found
      */
     @Override
-    public Product getProduct(Integer productId) throws RemoteException {
+    public void getProduct() throws RemoteException {
 
         Product fetchedProduct = null;
+        ServerSocket ss = null;
+        Socket socket = null;
         
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            
+            ss = new ServerSocket(SOCKET_PORT);
+            socket = ss.accept();
+            DataInputStream dis = new DataInputStream(socket.getInputStream());
+            Integer productId = dis.readInt();
             
             PreparedStatement statement = conn.prepareStatement("SELECT * FROM " + PRODUCT_TABLE_NAME + " WHERE " + PRODUCT_ID_COLUMN_NAME + " = ?");
             statement.setInt(1, productId);
@@ -80,10 +113,22 @@ public class ProductObject extends UnicastRemoteObject implements ProductInterfa
             }
             
         } catch (SQLException ex) {
-            System.out.println(ex.getSQLState());
+            System.out.println("SQLException: " + ex.getSQLState());
+        } catch (IOException ex ) {
+            System.out.println("IOException");
+        } finally {
+            
+            try {
+                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                oos.writeObject(fetchedProduct);
+                oos.flush();
+                oos.close();
+                socket.close();
+            } catch (IOException ex) {
+                System.out.println("IOException");
+            }
+            
         }
-        
-        return fetchedProduct;
         
     }
     
