@@ -158,7 +158,7 @@ public class Client {
         
         // Uses socket to feed and retrieve data
         Runnable createOrderThread2 = () -> {
-            Order newOrder = new Order(1, "spacy", 1);
+            Order newOrder = new Order(5, "spacy", 1);
             boolean success = false;
             try {
                 Socket socket = new Socket(HOST_ADDRESS, SOCKET_PORT);

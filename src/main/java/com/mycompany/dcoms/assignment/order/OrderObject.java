@@ -57,14 +57,20 @@ public class OrderObject extends UnicastRemoteObject implements OrderInterface {
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
             Order order = (Order)ois.readObject();
             
-            PreparedStatement statement = conn.prepareStatement(
+            PreparedStatement statement1 = conn.prepareStatement(
                     "INSERT INTO " + ORDER_TABLE_NAME + ""
                     + "(" + QUANTITY_COLUMN_NAME + "," + USERNAME_COLUMN_NAME + "," + PRODUCT_ID_COLUMN_NAME +")"
                             + " VALUES (?, ?, ?)");
-            statement.setInt(1, order.getQuantity());
-            statement.setString(2, order.getUsername());
-            statement.setInt(3, order.getProductId());
-            statement.executeUpdate();
+            statement1.setInt(1, order.getQuantity());
+            statement1.setString(2, order.getUsername());
+            statement1.setInt(3, order.getProductId());
+            statement1.executeUpdate();
+            
+            PreparedStatement statement2 = conn.prepareStatement("UPDATE TBLPRODUCT SET total_supply = total_supply - ? WHERE product_id = ?");
+            statement2.setInt(1, order.getQuantity());
+            statement2.setInt(2, order.getProductId());
+            statement2.executeUpdate();
+                    
             success = true;
             
         } catch (SQLException ex ) {
