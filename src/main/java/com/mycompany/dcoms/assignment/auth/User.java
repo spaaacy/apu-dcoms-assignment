@@ -14,16 +14,16 @@ public class User implements java.io.Serializable {
     String password;
     String firstName;
     String lastName;
-    Integer icNumber;
+    String icNumber;
 
-    public User(String username, String password, String firstName, String lastName, Integer icNumber) {
+    public User(String username, String password, String firstName, String lastName, String icNumber) {
         this.username = username;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.icNumber = icNumber;
     }
-    
+
     public String getUsername() {
         return username;
     }
@@ -56,12 +56,12 @@ public class User implements java.io.Serializable {
         this.lastName = lastName;
     }
 
-    public Integer getIcNumber() {
+    public String getIcNumber() {
         return icNumber;
     }
 
-    public void setIcNumber(Integer icNumber) {
+    public void setIcNumber(String icNumber) {
         this.icNumber = icNumber;
     }
-      
+    
 }

@@ -60,7 +60,7 @@ public class AuthObject extends UnicastRemoteObject implements AuthInterface {
             statement.setString(2, user.getPassword());
             statement.setString(3, user.getFirstName());
             statement.setString(4, user.getLastName());
-            statement.setInt(5, user.getIcNumber());
+            statement.setString(5, user.getIcNumber());
             statement.executeUpdate();
             
             success = true;

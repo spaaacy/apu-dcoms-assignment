@@ -68,7 +68,7 @@ public class Client {
         
         // Uses socket to feed and retrieve data
         Runnable registerThread2 = () -> {
-            User newUser = new User("test0", "abc123", "aakif", "ahamath", (int)(Math.random()*10000));
+            User newUser = new User("test03", "abc123", "aakif", "ahamath", "002141");
             boolean success = false;
             try {  
                 Socket socket = new Socket(HOST_ADDRESS, SOCKET_PORT);
