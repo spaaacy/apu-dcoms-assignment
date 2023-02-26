@@ -80,7 +80,7 @@ public class OrderObject extends UnicastRemoteObject implements OrderInterface {
                 dos.writeBoolean(success);
                 dos.flush();
                 dos.close();
-                socket.close();
+                ss.close();
             } catch (IOException ex) {
                 System.out.println("IOException");
             }
@@ -128,7 +128,7 @@ public class OrderObject extends UnicastRemoteObject implements OrderInterface {
                 oos.writeObject(allOrders);
                 oos.flush();
                 oos.close();
-                socket.close();
+                ss.close();
             } catch (IOException ex) {
                 System.out.println("IOException");
             }

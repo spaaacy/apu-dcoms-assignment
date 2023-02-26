@@ -1,8 +1,8 @@
 com\mycompany\dcoms\assignment\order\OrderInterface.class
 com\mycompany\dcoms\assignment\Server.class
 com\mycompany\dcoms\assignment\product\Product.class
+com\mycompany\dcoms\assignment\auth\NonUniqueDetailsExeception.class
 com\mycompany\dcoms\assignment\product\ProductInterface.class
-com\mycompany\dcoms\assignment\auth\UsernameExistsException.class
 com\mycompany\dcoms\assignment\auth\AuthInterface.class
 com\mycompany\dcoms\assignment\Client.class
 com\mycompany\dcoms\assignment\order\OrderObject.class

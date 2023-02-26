@@ -29,7 +29,7 @@ public class Server {
     static final String ORDER_SERVER_NAME = "order";
     static final String PRODUCT_SERVER_NAME = "product";
     
-    public static final Integer SERVER_PORT_NUMBER = 1050;
+    public static final Integer RMI_PORT = 1050;
     public static final Integer SOCKET_PORT = 1060;
     
     public static void main(String[] args) throws RemoteException {
@@ -38,7 +38,7 @@ public class Server {
         OrderInterface order = new OrderObject();
         ProductInterface product = new ProductObject();
         
-        Registry reg = LocateRegistry.createRegistry(SERVER_PORT_NUMBER);
+        Registry reg = LocateRegistry.createRegistry(RMI_PORT);
         reg.rebind(AUTH_SERVER_NAME, auth);
         reg.rebind(ORDER_SERVER_NAME, order);
         reg.rebind(PRODUCT_SERVER_NAME, product);
