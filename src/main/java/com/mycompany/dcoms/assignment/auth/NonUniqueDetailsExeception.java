@@ -11,7 +11,7 @@ package com.mycompany.dcoms.assignment.auth;
 public class NonUniqueDetailsExeception extends Exception {
     
     static final String SQL_PRIMARY_KEY_ERROR_CODE = "23505";
-    static String errorMessage = "Username already exists!";
+    static String errorMessage = "Username/IC already exists!";
     
     NonUniqueDetailsExeception(Exception ex) {
         super(errorMessage, ex);

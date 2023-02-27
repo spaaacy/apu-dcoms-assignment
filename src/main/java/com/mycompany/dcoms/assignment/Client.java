@@ -25,8 +25,6 @@ import java.util.LinkedList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -82,7 +80,6 @@ public class Client {
                 socket.close();
             } catch (IOException ex) {
                 System.out.println("IOException");
-                System.out.println(ex.getCause() + ex.getMessage());
             } finally {
                 System.out.println("Register successful: " + success);
             }

@@ -6,15 +6,10 @@ package com.mycompany.dcoms.assignment;
 
 import com.mycompany.dcoms.assignment.auth.AuthInterface;
 import com.mycompany.dcoms.assignment.auth.AuthObject;
-import com.mycompany.dcoms.assignment.auth.User;
 import com.mycompany.dcoms.assignment.order.OrderInterface;
 import com.mycompany.dcoms.assignment.order.OrderObject;
 import com.mycompany.dcoms.assignment.product.ProductInterface;
 import com.mycompany.dcoms.assignment.product.ProductObject;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
