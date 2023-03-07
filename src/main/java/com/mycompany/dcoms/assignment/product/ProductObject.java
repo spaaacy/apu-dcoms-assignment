@@ -39,45 +39,52 @@ public class ProductObject extends UnicastRemoteObject implements ProductInterfa
     @Override
     public void getAllProducts() throws RemoteException {
 
-        LinkedList<Product> fetchedProducts = new LinkedList<Product>();
-        ServerSocket ss = null;
-        Socket socket = null;
+        Runnable getAllProducts = new Runnable() {
+            @Override
+            public void run() {
+                LinkedList<Product> fetchedProducts = new LinkedList<Product>();
+                ServerSocket ss = null;
+                Socket socket = null;
 
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+                try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
 
-            ss = new ServerSocket(SOCKET_PORT);
-            socket = ss.accept();
+                    ss = new ServerSocket(SOCKET_PORT);
+                    socket = ss.accept();
 
-            PreparedStatement statement = conn.prepareStatement("SELECT * FROM " + PRODUCT_TABLE_NAME);
-            ResultSet results = statement.executeQuery();
+                    PreparedStatement statement = conn.prepareStatement("SELECT * FROM " + PRODUCT_TABLE_NAME);
+                    ResultSet results = statement.executeQuery();
 
-            while (results.next()) {
-                Integer fetchedProductId = results.getInt(1);
-                String fetchedProductName = results.getString(2);
-                Double fetchedPrice = results.getDouble(3);
-                Integer fetchedTotalSupply = results.getInt(4);
+                    while (results.next()) {
+                        Integer fetchedProductId = results.getInt(1);
+                        String fetchedProductName = results.getString(2);
+                        Double fetchedPrice = results.getDouble(3);
+                        Integer fetchedTotalSupply = results.getInt(4);
 
-                Product fetchedProduct = new Product(fetchedProductId, fetchedProductName, fetchedPrice, fetchedTotalSupply);
-                fetchedProducts.add(fetchedProduct);
+                        Product fetchedProduct = new Product(fetchedProductId, fetchedProductName, fetchedPrice, fetchedTotalSupply);
+                        fetchedProducts.add(fetchedProduct);
+                    }
+
+                } catch (SQLException ex) {
+                    System.out.println("SQLException: " + ex.getSQLState());
+                } catch (IOException ex) {
+                    System.out.println("IOException");
+                } finally {
+
+                    try {
+                        ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                        oos.writeObject(fetchedProducts);
+                        oos.flush();
+                        oos.close();
+                        ss.close();
+                    } catch (IOException ex) {
+                        System.out.println("IOException");
+                    }
+
+                }
             }
+        };
 
-        } catch (SQLException ex) {
-            System.out.println("SQLException: " + ex.getSQLState());
-        } catch (IOException ex) {
-            System.out.println("IOException");
-        } finally {
-
-            try {
-                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-                oos.writeObject(fetchedProducts);
-                oos.flush();
-                oos.close();
-                ss.close();
-            } catch (IOException ex) {
-                System.out.println("IOException");
-            }
-
-        }
+        new Thread(getAllProducts).start();
     }
 
     /**
@@ -87,48 +94,55 @@ public class ProductObject extends UnicastRemoteObject implements ProductInterfa
     @Override
     public void getProduct() throws RemoteException {
 
-        Product fetchedProduct = null;
-        ServerSocket ss = null;
-        Socket socket = null;
+        Runnable getProduct = new Runnable() {
+            @Override
+            public void run() {
+                Product fetchedProduct = null;
+                ServerSocket ss = null;
+                Socket socket = null;
 
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+                try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
 
-            ss = new ServerSocket(SOCKET_PORT);
-            socket = ss.accept();
-            DataInputStream dis = new DataInputStream(socket.getInputStream());
-            Integer productId = dis.readInt();
+                    ss = new ServerSocket(SOCKET_PORT);
+                    socket = ss.accept();
+                    DataInputStream dis = new DataInputStream(socket.getInputStream());
+                    Integer productId = dis.readInt();
 
-            PreparedStatement statement = conn.prepareStatement("SELECT * FROM " + PRODUCT_TABLE_NAME + " WHERE " + PRODUCT_ID_COLUMN_NAME + " = ?");
-            statement.setInt(1, productId);
-            ResultSet results = statement.executeQuery();
+                    PreparedStatement statement = conn.prepareStatement("SELECT * FROM " + PRODUCT_TABLE_NAME + " WHERE " + PRODUCT_ID_COLUMN_NAME + " = ?");
+                    statement.setInt(1, productId);
+                    ResultSet results = statement.executeQuery();
 
-            while (results.next()) {
-                Integer fetchedProductId = results.getInt(1);
-                String fetchedProductName = results.getString(2);
-                Double fetchedPrice = results.getDouble(3);
-                Integer fetchedTotalSupply = results.getInt(4);
+                    while (results.next()) {
+                        Integer fetchedProductId = results.getInt(1);
+                        String fetchedProductName = results.getString(2);
+                        Double fetchedPrice = results.getDouble(3);
+                        Integer fetchedTotalSupply = results.getInt(4);
 
-                fetchedProduct = new Product(fetchedProductId, fetchedProductName, fetchedPrice, fetchedTotalSupply);
+                        fetchedProduct = new Product(fetchedProductId, fetchedProductName, fetchedPrice, fetchedTotalSupply);
+                    }
+
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                    System.out.println("SQLException: " + ex.getSQLState());
+                } catch (IOException ex) {
+                    System.out.println("IOException");
+                } finally {
+
+                    try {
+                        ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                        oos.writeObject(fetchedProduct);
+                        oos.flush();
+                        oos.close();
+                        ss.close();
+                    } catch (IOException ex) {
+                        System.out.println("IOException");
+                    }
+
+                }
             }
-
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-            System.out.println("SQLException: " + ex.getSQLState());
-        } catch (IOException ex) {
-            System.out.println("IOException");
-        } finally {
-
-            try {
-                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-                oos.writeObject(fetchedProduct);
-                oos.flush();
-                oos.close();
-                ss.close();
-            } catch (IOException ex) {
-                System.out.println("IOException");
-            }
-
-        }
+        };
+        
+        new Thread(getProduct).start();
 
     }
 
