@@ -6,7 +6,6 @@ package com.mycompany.dcoms.assignment;
 
 import com.mycompany.dcoms.assignment.auth.AuthInterface;
 import com.mycompany.dcoms.assignment.auth.User;
-import com.mycompany.dcoms.assignment.auth.NonUniqueDetailsExeception;
 import com.mycompany.dcoms.assignment.order.Order;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
@@ -53,11 +52,13 @@ public class Client {
         System.out.println("\tREGISTER");
 
         boolean successRegister = false;
+        boolean nonUniqueDetails = false;
+        
         try {
             
             User newUser = new User("test04", "abc123", "aakif", "ahamath", "002142");
             authObject.register();
-            Thread.sleep(500L);
+            Thread.sleep(500L); // Necessary to ensure ServerSocket instantiated before attempting to connecting using Socket
             
             Socket socket = new Socket(HOST_ADDRESS, SOCKET_PORT);
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
@@ -65,19 +66,19 @@ public class Client {
             oos.flush();
             DataInputStream dis = new DataInputStream(socket.getInputStream());
             successRegister = dis.readBoolean();
+            nonUniqueDetails = dis.readBoolean();
             oos.close();
             socket.close();
             
-        } catch (NonUniqueDetailsExeception ex) {
-            System.out.println("Username/IC already exists");
-        } catch (RemoteException ex) {
-            System.out.println("RemoteException");
         } catch (IOException ex) {
             System.out.println("IOException");
         } 
         
         finally {
             System.out.println("Register successful: " + successRegister);
+            if (nonUniqueDetails) {
+                System.out.println("Username/IC already exists");
+            }
         }
 
         /**
@@ -91,7 +92,7 @@ public class Client {
         try {
             
             authObject.login();
-            Thread.sleep(500L);
+            Thread.sleep(500L); // Necessary to ensure ServerSocket instantiated before attempting to connecting using Socket
             
             Socket socket = new Socket(HOST_ADDRESS, SOCKET_PORT);
             DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
@@ -121,7 +122,7 @@ public class Client {
             
             Order newOrder = new Order(5, "spacy", 1);
             orderObject.createOrder();
-            Thread.sleep(500L);
+            Thread.sleep(500L); // Necessary to ensure ServerSocket instantiated before attempting to connecting using Socket
             
             Socket socket = new Socket(HOST_ADDRESS, SOCKET_PORT);
             ObjectOutputStream ois = new ObjectOutputStream(socket.getOutputStream());
@@ -132,8 +133,6 @@ public class Client {
             ois.close();
             socket.close();
             
-        } catch (RemoteException ex) {
-            System.out.println("RemoteException");
         } catch (IOException ex) {
             System.out.println("IOException");
         } 
@@ -151,7 +150,7 @@ public class Client {
         try {
             
             orderObject.getOrders();
-            Thread.sleep(500L);
+            Thread.sleep(500L); // Necessary to ensure ServerSocket instantiated before attempting to connecting using Socket
             
             String username = "spacy";
             Socket socket = new Socket(HOST_ADDRESS, SOCKET_PORT);
@@ -163,8 +162,6 @@ public class Client {
             dos.close();
             socket.close();
             
-        } catch (RemoteException ex) {
-            System.out.println("RemoteException");
         } catch (IOException ex) {
             System.out.println("IOException");
         } catch (ClassNotFoundException ex) {
@@ -192,7 +189,7 @@ public class Client {
             
             Integer productId = 3;
             productObject.getProduct();
-            Thread.sleep(500L);
+            Thread.sleep(500L); // Necessary to ensure ServerSocket instantiated before attempting to connecting using Socket
 
             Socket socket = new Socket(HOST_ADDRESS, SOCKET_PORT);
             DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
@@ -203,8 +200,6 @@ public class Client {
             dos.close();
             socket.close();
             
-        } catch (RemoteException ex) {
-            System.out.println("RemoteException");
         } catch (IOException ex) {
             System.out.println("IOException");
         } catch (ClassNotFoundException ex) {
@@ -229,7 +224,7 @@ public class Client {
         try {
             
             productObject.getAllProducts();
-            Thread.sleep(500L);
+            Thread.sleep(500L); // Necessary to ensure ServerSocket instantiated before attempting to connecting using Socket
 
             Socket socket = new Socket(HOST_ADDRESS, SOCKET_PORT);
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
@@ -237,8 +232,6 @@ public class Client {
             ois.close();
             socket.close();
             
-        } catch (RemoteException ex) {
-            System.out.println("RemoteException");
         } catch (IOException ex) {
             System.out.println("IOException");
         } catch (ClassNotFoundException ex) {

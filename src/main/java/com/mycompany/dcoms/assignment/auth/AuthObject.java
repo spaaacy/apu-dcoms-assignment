@@ -3,7 +3,6 @@
  */
 package com.mycompany.dcoms.assignment.auth;
 
-import static com.mycompany.dcoms.assignment.auth.NonUniqueDetailsExeception.SQL_PRIMARY_KEY_ERROR_CODE;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -32,6 +31,7 @@ public class AuthObject extends UnicastRemoteObject implements AuthInterface {
     static final String USER_TABLE_NAME = "TBLUSER";
     static final String USERNAME_COLUMN_NAME = "username";
     static final String PASSWORD_COLUMN_NAME = "password";
+        static final String SQL_DUPLICATE_ERROR_CODE = "23505";
 
     public AuthObject() throws RemoteException {
         super();
@@ -42,12 +42,16 @@ public class AuthObject extends UnicastRemoteObject implements AuthInterface {
      * exists
      */
     @Override
-    public void register() throws RemoteException, NonUniqueDetailsExeception {
+    public void register() throws RemoteException {
+        
 
         Runnable register = new Runnable() {
             @Override
             public void run() {
+                
             boolean success = false;
+            boolean nonUniqueDetails = false;
+            
                 ServerSocket ss = null;
                 Socket socket = null;
 
@@ -69,8 +73,8 @@ public class AuthObject extends UnicastRemoteObject implements AuthInterface {
                 } catch (SQLException ex) {
                     // SQLState 23505 represents instance where primary key pre-exists in table
                     System.out.println(ex.getSQLState());
-                    if (ex.getSQLState().equals(SQL_PRIMARY_KEY_ERROR_CODE)) {
-//                        throw new NonUniqueDetailsExeception(ex); // TODO: Change this
+                    if (ex.getSQLState().equals(SQL_DUPLICATE_ERROR_CODE)) {
+                        nonUniqueDetails = true;
                     }
                 } catch (IOException ex) {
                     System.out.println("IOException");
@@ -81,6 +85,7 @@ public class AuthObject extends UnicastRemoteObject implements AuthInterface {
                     try {
                         DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
                         dos.writeBoolean(success);
+                        dos.writeBoolean(nonUniqueDetails);
                         dos.flush();
                         dos.close();
                         ss.close();

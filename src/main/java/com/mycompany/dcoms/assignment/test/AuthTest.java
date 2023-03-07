@@ -5,7 +5,6 @@
 package com.mycompany.dcoms.assignment.test;
 
 import com.mycompany.dcoms.assignment.auth.AuthInterface;
-import com.mycompany.dcoms.assignment.auth.NonUniqueDetailsExeception;
 import com.mycompany.dcoms.assignment.auth.User;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

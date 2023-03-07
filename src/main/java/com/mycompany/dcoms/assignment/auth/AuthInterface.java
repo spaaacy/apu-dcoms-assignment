@@ -13,7 +13,7 @@ import java.rmi.RemoteException;
  */
 public interface AuthInterface extends Remote {
 
-    public void register() throws RemoteException, NonUniqueDetailsExeception;
+    public void register() throws RemoteException;
     public void login() throws RemoteException;
 
 }
